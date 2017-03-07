@@ -113,7 +113,7 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
             titleText = (g.L10N)?g.enM[g.m-1] + " " + g.y + " " + titleText:g.y + "年" + g.m + "月" + titleText;
             m.childNodes[1].appendChild(nd.createTxt(titleText));
             m.childNodes[1].title = (g.L10N)?"Switching between published and updated":"公開日と更新日を切り替える";
-            dt = new Date(2013,3,1);  // 最初の投稿月の日付オブジェクトを取得。
+            dt = new Date(2013,3-1,1);  // 最初の投稿月の日付オブジェクトを取得。
             var firstpost = new Date(dt.getFullYear(), dt.getMonth(),1);  // 1日のミリ秒を取得。
             if (firstpost < caldate) {  // 表示カレンダーの月が初投稿月より未来のときのみ右矢印を表示させる。
                 
