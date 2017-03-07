@@ -97,13 +97,15 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                 }
                 m.appendChild(node);  // カレンダーのflexコンテナに追加。
             });
+        	m.appendChild(d);  // １日の日付のdivのみ追加。
         	return m;
         },
         createCalendar:  function() {  // カレンダーのHTML要素を作成。 
         	var m = cal._nodes.cloneNode(true);
         	var dt = new Date();  // 今日の日付オブジェクトを取得。
-        	var now = new Date(dt.getFullYear(), dt.getMonth(),1);  // 今月の1日のミリ秒を取得。
-        	var caldate = new Date(g.y, g.m-1,1);  // カレンダーの1日のミリ秒を取得。
+        	var now = new Date(dt.getFullYear(), dt.getMonth(),1).getTime();  // 今月の1日のミリ秒を取得。
+        	var caldt = new Date(g.y, g.m-1,1);
+        	var caldate = caldt.getTime();  // カレンダーの1日のミリ秒を取得。
         	if (now > caldate) {  // 表示カレンダーの月が現在より過去のときのみ左矢印を表示させる。
         		m.childNodes[0].appendChild(nd.createTxt('\u00ab'));
         		m.childNodes[0].style.cursor = "pointer";  // マウスポインタの形状を変化させる。
@@ -114,31 +116,20 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
             m.childNodes[1].appendChild(nd.createTxt(titleText));
             m.childNodes[1].title = (g.L10N)?"Switching between published and updated":"公開日と更新日を切り替える";
             dt = new Date(2013,3-1,1);  // 最初の投稿月の日付オブジェクトを取得。
-            var firstpost = new Date(dt.getFullYear(), dt.getMonth(),1);  // 1日のミリ秒を取得。
+            var firstpost = new Date(dt.getFullYear(), dt.getMonth(),1).getTime();  // 1日のミリ秒を取得。
             if (firstpost < caldate) {  // 表示カレンダーの月が初投稿月より未来のときのみ右矢印を表示させる。
-                
-            	
-            	var node = nd._arrowflxI('\u00bb',"right_calendar");
-                node.style.cursor = "pointer";  // マウスポインタの形状を変化させる。
-                node.title = (g.L10N)?"Older":"前月へ";
-                return node;
+        		m.childNodes[2].appendChild(nd.createTxt('\u00bb'));
+        		m.childNodes[2].style.cursor = "pointer";  // マウスポインタの形状を変化させる。
+        		m.childNodes[2].title = (g.L10N)?"Older":"前月へ";           
             }
-            
-            
-            calflxC.appendChild(nd.rightarrowflxI());  // 右向き矢印のflexアイテム。flexBasis14%。
-            g.days.forEach(function(e,i){  // 1行目に曜日を表示させる。2番目の引数は配列のインデックス。
-                var node = nd.calflxI(e);  // 曜日のflexアイテムを取得。
-                node.s = i;  // 曜日番号を取得。
-                cal._getDayC(node);  // 曜日の色をつける。
-                if (g.L10N) {
-                    node.style.fontSize = "80%";  // 英語表記では1行に収まらないのでフォントサイズを縮小。
-                }
-                calflxC.appendChild(node);  // カレンダーのflexコンテナに追加。
-            });
-            var day =  new Date(g.y, g.m-1, 1).getDay();  // 1日の曜日を取得。日曜日は0、土曜日は6になる。
+            var day =  caldt.getDay();  // 1日の曜日を取得。日曜日は0、土曜日は6になる。
+            var d = m.lastChild;
+            m.removeChild(m.lastChild);
             for(var i = 0; i < day; i++) { // 1日までの空白となるflexアイテムを開始曜日分まで取得。
-                calflxC.appendChild(nd.calflxI());  // 空白のカレンダーのflexアイテムをflexコンテナに追加。
+            	m.appendChild(d);
             }
+            
+            
             var dateflxI;  // 日のflexアイテム。
             for(var i = 1; i < g.em+1; i++) {  // 1日から末日まで。
                 if (i in g.dic) {  // 辞書のキーに日があるとき
