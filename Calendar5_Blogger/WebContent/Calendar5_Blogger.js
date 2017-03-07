@@ -83,21 +83,26 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
         	a.setAttribute("style","flex:0 0 14%;text-align:center;");
         	m.appendChild(a);
         	var t =  nd.createElem("div");
-        	t.setAttirbute("style","flex:1 0 72%;text-align:center;cursor:pointer;")
+        	t.setAttribute("style","flex:1 0 72%;text-align:center;cursor:pointer;")
         	m.appendChild(t);
         	m.appendChild(a.cloneNode(true));
         	var d = nd.createElem("div");
         	d.setAttribute("style","flex:1 0 14%;text-align:center;");
         	g.days.forEach(function(e,i){  // 1行目に曜日を表示させる。2番目の引数は配列のインデックス。
         		var node = d.cloneNode(true);
-                node.s = i;  // 曜日番号を取得。
-                cal._getDayC(node);  // 曜日の色をつける。
+                cal._getDayC(node,i);  // 曜日の色をつける。
                 if (g.L10N) {
                     node.style.fontSize = "80%";  // 英語表記では1行に収まらないのでフォントサイズを縮小。
                 }
                 m.appendChild(node);  // カレンダーのflexコンテナに追加。
             });
-        	m.appendChild(d);  // １日の日付のdivのみ追加。
+        	for (i=0;i<35;i++) {
+        		m.appendChild(d.cloneNode(true)); 
+        	}
+        	d.style.display = "none";
+        	for (i=0;i<7;i++) {
+        		m.appendChild(d.cloneNode(true)); 
+        	}
         	return m;
         },
         createCalendar:  function() {  // カレンダーのHTML要素を作成。 
@@ -123,55 +128,63 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
         		m.childNodes[2].title = (g.L10N)?"Older":"前月へ";           
             }
             var day =  caldt.getDay();  // 1日の曜日を取得。日曜日は0、土曜日は6になる。
-            var d = m.lastChild;
-            m.removeChild(m.lastChild);
-            for(var i = 0; i < day; i++) { // 1日までの空白となるflexアイテムを開始曜日分まで取得。
-            	m.appendChild(d);
-            }
-            
-            
-            var dateflxI;  // 日のflexアイテム。
-            for(var i = 1; i < g.em+1; i++) {  // 1日から末日まで。
+            var c = 9 + day;
+            var t;
+            for(var i = 1; i < 1+g.em; i++) { // 1日から末日まで。
+//            	var d = m.childNodes[c+i];
+            	m.childNodes[c+i].appendChild(nd.createTxt(i));
                 if (i in g.dic) {  // 辞書のキーに日があるとき
-                    dateflxI = nd.dateflxIWithPost(i); // 投稿のある日のカレンダーのflexアイテム。
                     g.dic[i].forEach(function(arr) {  // title属性に投稿タイトルのみ入れる。
-                        dateflxI.title += (dateflxI.title)?"\n" + "\u30fb" + arr[1]:"\u30fb" + arr[1];
+                        t += (t)?"\n" + "\u30fb" + arr[1]:"\u30fb" + arr[1];
                     });
-                } else {  // 辞書のキーに日がないとき
-                    dateflxI = nd.calflxI(i); // 投稿のない日のカレンダーのflexアイテム。  
-                    dateflxI.className = "nopost"; 
+                    m.childNodes[c+i].title = t;
+                } else {  // 辞書のキーに日がないとき  
+                	m.childNodes[c+i].className = "nopost"; 
                 } 
-                dateflxI.s = (day+i-1) % 7;  // 7で割ったあまりを取得。0が日曜日、6が土曜日。これは曜日番号になる。
-                cal._getDayC(dateflxI);  // 曜日の色をつける。
-                cal._getHolidayC(dateflxI);  // 祝日に色をつける。
-                calflxC.appendChild(dateflxI);  // カレンダーのflexコンテナに追加。
+                cal._getDayC(m.childNodes[c+i],(c+i-10)%7);  // 曜日の色をつける。
+                cal._getHolidayC(m.childNodes[c+i],i);  // 祝日に色をつける。
+                m.appendChild(m.childNodes[c+i]);  // カレンダーのflexコンテナに追加。            	
             }
-            var s = (day+g.em) % 7;  // 7で割ったあまりを取得。
-            if (s > 0) {  // 7で割り切れない時。
-                for(var i = 0; i < 7-s; i++) { // 末日以降の空白を取得。
-                    calflxC.appendChild(nd.calflxI());  //  空白のカレンダーのflexアイテムをflexコンテナに追加。
-                }        
-            } 
-            calflxC.addEventListener( 'mousedown', eh.mouseDown, false );  // カレンダーのflexコンテナでイベントバブリングを受け取る。マウスが要素をクリックしたとき。
-            calflxC.addEventListener( 'mouseover', eh.mouseOver, false );  // マウスポインタが要素に入った時。
-            calflxC.addEventListener( 'mouseout', eh.mouseOut, false );  // マウスポインタが要素から出た時。
+           var max = 38; 
+           if (day+g.em-35>0) {
+           	   max = 52;
+           } else if (day+g.em-28>0) {
+        	   max = 45;  
+           }
+           for (var i = 38;i<max;i++) {
+        	   m.childNodes[i].style.display = "inline";
+           }           
+            m.addEventListener( 'mousedown', eh.mouseDown, false );  // カレンダーのflexコンテナでイベントバブリングを受け取る。マウスが要素をクリックしたとき。
+            m.addEventListener( 'mouseover', eh.mouseOver, false );  // マウスポインタが要素に入った時。
+            m.addEventListener( 'mouseout', eh.mouseOut, false );  // マウスポインタが要素から出た時。
             g.elem.textContent = null;  // 追加する対象の要素の子ノードを消去する。
-            g.elem.appendChild(calflxC);  // 追加する対象の要素の子ノードにカレンダーのflexコンテナを追加。
+            g.elem.appendChild(m);  // 追加する対象の要素の子ノードにカレンダーのflexコンテナを追加。
+            
+            
+//          datePostsNode: function() {  // 日の投稿データを表示させるflexコンテナを返す。
+//          var node = eh.createElem("div");  // flexコンテナになるdiv要素を生成。
+//          node.style.display = "flex";  // flexコンテナにする。
+//          node.id = g.dataPostsID;  // idを設定。
+//          node.style.flexDirection = "column";  // flexアイテムを縦並びにする。
+//          return node;
+//      },            
+            
+            
+            
             g.elem.appendChild(nd.datePostsNode());  // 日の投稿データを表示させるflexコンテナを追加。
         },
-        _getHolidayC: function(node) {  // 祝日に色をつける。JSON文字列はhttps://p--q.blogspot.jp/2016/12/blogger10json.htmlを作成。
+        _getHolidayC: function(node,i) {  // 祝日に色をつける。JSON文字列はhttps://p--q.blogspot.jp/2016/12/blogger10json.htmlを作成。
             // キーは年、値は二元元配列。1次が月数、二次が祝日の配列。
             var holidays = {"2013":[[1,14],[11],[20],[29],[3,4,5,6],[],[15],[],[16,23],[14],[3,4,23],[23]],"2014":[[1,13],[11],[21],[29],[3,4,5,6],[],[21],[],[15,23],[13],[3,23,24],[23]],"2015":[[1,12],[11],[21],[29],[3,4,5,6],[],[20],[],[21,22,23],[12],[3,23],[23]],"2016":[[1,11],[11],[20,21],[29],[3,4,5],[],[18],[11],[19,22],[10],[3,23],[23]],"2017":[[1,9],[11],[20],[29],[3,4,5],[],[17],[11],[18,23],[9],[3,23],[23]],"2018":[[1,8],[11,12],[21],[29,30],[3,4,5],[],[16],[11],[17,23,24],[8],[3,23],[23,24]],"2019":[[1,14],[11],[21],[29],[3,4,5,6],[],[15],[11,12],[16,23],[14],[3,4,23],[23]],"2020":[[1,13],[11],[20],[29],[3,4,5,6],[],[20],[11],[21,22],[12],[3,23],[23]],"2021":[[1,11],[11],[20],[29],[3,4,5],[],[19],[11],[20,23],[11],[3,23],[23]],"2022":[[1,10],[11],[21],[29],[3,4,5],[],[18],[11],[19,23],[10],[3,23],[23]],"2023":[[1,9],[11],[21],[29],[3,4,5],[],[17],[11],[18,23],[9],[3,23],[23]],"2024":[[1,8],[11,12],[20],[29],[3,4,5,6],[],[15],[11,12],[16,22,23],[14],[3,4,23],[23]],"2025":[[1,13],[11],[20],[29],[3,4,5,6],[],[21],[11],[15,23],[13],[3,23,24],[23]],"2026":[[1,12],[11],[20],[29],[3,4,5,6],[],[20],[11],[21,22,23],[12],[3,23],[23]],"2027":[[1,11],[11],[21,22],[29],[3,4,5],[],[19],[11],[20,23],[11],[3,23],[23]],"2028":[[1,10],[11],[20],[29],[3,4,5],[],[17],[11],[18,22],[9],[3,23],[23]],"2029":[[1,8],[11,12],[20],[29,30],[3,4,5],[],[16],[11],[17,23,24],[8],[3,23],[23,24]],"2030":[[1,14],[11],[20],[29],[3,4,5,6],[],[15],[11,12],[16,23],[14],[3,4,23],[23]]};
             var arr = holidays[g.y][g.m-1];  // 祝日の配列を取得。
-            var d = Number(node.textContent);  // 数値に変換
-            if (arr.indexOf(d) != -1) {  // 祝日配列に日付があるとき。in演算子はインデックスの有無の確認をするだけ。
+            if (arr.indexOf(i) != -1) {  // 祝日配列に日付があるとき。in演算子はインデックスの有無の確認をするだけ。
                 node.style.color = cal._holidayC;
             }
         },
-        _getDayC: function(node){  // 曜日の色をつける。オブジェクトの参照渡しを利用。
-            if (node.s==0) {  // 日曜日のとき
+        _getDayC: function(node,s){  // 曜日の色をつける。オブジェクトの参照渡しを利用。
+            if (s==0) {  // 日曜日のとき
                 node.style.color = cal._holidayC;
-            } else if (node.s==6) {  // 土曜日のとき
+            } else if (s==6) {  // 土曜日のとき
                 node.style.color = cal._SatC;
             }            
         },
