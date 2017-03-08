@@ -97,11 +97,15 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                 m.appendChild(node);  // カレンダーのflexコンテナに追加。
             });
         	for (i=0;i<35;i++) {
-        		m.appendChild(d.cloneNode(true)); 
+        		var node = d.cloneNode(true);
+        		cal._getDayC(node,i%7);  // 曜日の色をつける。
+        		m.appendChild(node); 
         	}
         	d.style.display = "none";
         	for (i=0;i<7;i++) {
-        		m.appendChild(d.cloneNode(true)); 
+        		var node = d.cloneNode(true);
+        		cal._getDayC(node,i%7);  // 曜日の色をつける。
+        		m.appendChild(node); 
         	}
         	return m;
         },
@@ -115,35 +119,41 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
         		m.childNodes[0].appendChild(nd.createTxt('\u00ab'));
         		m.childNodes[0].style.cursor = "pointer";  // マウスポインタの形状を変化させる。
         		m.childNodes[0].title = (g.L10N)?"Newer":"翌月へ";
+        		m.childNodes[0].id = "left_calendar";
         	}
             var titleText =  (g.L10N)?((g.order=="published")?"":"updated"):((g.order=="published")?"":"更新");
             titleText = (g.L10N)?g.enM[g.m-1] + " " + g.y + " " + titleText:g.y + "年" + g.m + "月" + titleText;
             m.childNodes[1].appendChild(nd.createTxt(titleText));
             m.childNodes[1].title = (g.L10N)?"Switching between published and updated":"公開日と更新日を切り替える";
+            m.childNodes[1].id = "title_calendar";
             dt = new Date(2013,3-1,1);  // 最初の投稿月の日付オブジェクトを取得。
             var firstpost = new Date(dt.getFullYear(), dt.getMonth(),1).getTime();  // 1日のミリ秒を取得。
             if (firstpost < caldate) {  // 表示カレンダーの月が初投稿月より未来のときのみ右矢印を表示させる。
         		m.childNodes[2].appendChild(nd.createTxt('\u00bb'));
         		m.childNodes[2].style.cursor = "pointer";  // マウスポインタの形状を変化させる。
-        		m.childNodes[2].title = (g.L10N)?"Older":"前月へ";           
+        		m.childNodes[2].title = (g.L10N)?"Older":"前月へ";   
+        		m.childNodes[2].id = "right_calendar";
             }
             var day =  caldt.getDay();  // 1日の曜日を取得。日曜日は0、土曜日は6になる。
             var c = 9 + day;
-            var t;
             for(var i = 1; i < 1+g.em; i++) { // 1日から末日まで。
-//            	var d = m.childNodes[c+i];
-            	m.childNodes[c+i].appendChild(nd.createTxt(i));
+            	var d = m.childNodes[c+i];
+            	d.appendChild(nd.createTxt(i));
+            	var t;
                 if (i in g.dic) {  // 辞書のキーに日があるとき
                     g.dic[i].forEach(function(arr) {  // title属性に投稿タイトルのみ入れる。
-                        t += (t)?"\n" + "\u30fb" + arr[1]:"\u30fb" + arr[1];
+//                        t += (t)?"\n" + "\u30fb" + arr[1]:"\u30fb" + arr[1];
+                    	t += (t)?"\n" + "\u30fb" + arr[1]:"\u30fb" + arr[1];
                     });
-                    m.childNodes[c+i].title = t;
+                    d.title = t;
+                    d.className = "post"; 
+                    var cssTxt = d.style.cssText + "background-color:rgba(128,128,128,.4);border-radius:50%;cursor:pointer;";
+                    d.setAttribute("style",cssTxt);
                 } else {  // 辞書のキーに日がないとき  
-                	m.childNodes[c+i].className = "nopost"; 
+                	d.className = "nopost"; 
                 } 
-                cal._getDayC(m.childNodes[c+i],(c+i-10)%7);  // 曜日の色をつける。
-                cal._getHolidayC(m.childNodes[c+i],i);  // 祝日に色をつける。
-                m.appendChild(m.childNodes[c+i]);  // カレンダーのflexコンテナに追加。            	
+//                cal._getDayC(d,(c+i-10)%7);  // 曜日の色をつける。
+                cal._getHolidayC(d,i);  // 祝日に色をつける。        	
             }
            var max = 38; 
            if (day+g.em-35>0) {
@@ -152,7 +162,7 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
         	   max = 45;  
            }
            for (var i = 38;i<max;i++) {
-        	   m.childNodes[i].style.display = "inline";
+        	   m.childNodes[i].style.display = null;
            }           
             m.addEventListener( 'mousedown', eh.mouseDown, false );  // カレンダーのflexコンテナでイベントバブリングを受け取る。マウスが要素をクリックしたとき。
             m.addEventListener( 'mouseover', eh.mouseOver, false );  // マウスポインタが要素に入った時。
@@ -204,75 +214,20 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
         }
     };  // end of cal
     var nd = {  // ノード関連。
-//    		divClass: function(classNames) {  // クラス名の配列を引数としてdiv要素を返す関数。
-//    			return nd._tagClass("div", classNames);
-//    		},
-//    		h3Class: function(classNames) {  // クラス名の配列を引数としてh3要素を返す関数。
-//    			return nd._tagClass("h3", classNames);
-//    		},
-//    		imgClass: function(classNames) {  // クラス名の配列を引数としてimg要素を返す関数。
-//    			return nd._tagClass("img", classNames);
-//    		},
-//    		_tagClass: function(tag,classNames) {  // 生成するtag名、クラス名の配列を引数として要素を返す関数。
-//    			var node = nd.createElem(tag);  // tag要素を作成。
-//    			if (classNames.length){
-//    				classNames.forEach(function(e) {
-//    					node.classList.add(e);  // クラスを追加。
-//    				});
-//    			}
-//    			return node;				
-//    		},
     		createElem: function(tag) {  // tagの要素を作成して返す関数。
     			return document.createElement(tag); 
     		},
     		createTxt: function(txt) {  // テキストノードを返す関数。
     			return document.createTextNode(txt);
     		},
-//    		stackNodes: function(stack) {  // ノードの配列を引数として入れ子のノードを返す関数。
-//    			var p;
-//    	    	var c = stack.pop();
-//    	    	while (stack.length) {  // 配列の要素の有無でfalseは判断できないので配列の長さで判断する。
-//    	    		p = stack.pop();
-//    	    		p.appendChild(c);
-//    	    		c = p;
-//    	    	}
-//    	    	return p||c;
-//    		},
-//    		appendChild: function(parent,child) {  // parentの最後のノードにchildを追加する。
-//    			var c = parent.firstChild;  // parent.childs[0]にすると構文エラーになる。
-//    			if (!c) {parent.appendChild(child);} 
-//    			while (c) {
-//    				var d = c.firstChild;
-//    				if (!d) {c.appendChild(child);} 
-//    				c = d;
-//    			}
-//    		}
         };  // end of nd   
     
     
 //    var nd = {  // HTML要素のノードを作成するオブジェクト。
-//        calflxC: function() {  // カレンダーのflexコンテナを返す。
-//            var node = eh.createElem("div");  // flexコンテナになるdiv要素を生成。
-//            node.style.display = "flex";  // flexコンテナにする。
-//            node.style.flexWrap = "wrap";  // flexコンテナの要素を折り返す。 
-//            return node;
-//        },
-//        calflxI: function(text) {  // カレンダーのflexアイテムを返す。
-//            var node = eh.createElem("div");  // flexアイテムになるdiv要素を生成。
-//            node.textContent = text;
-//            node.style.flex = "1 0 14%";  // flexアイテムの最低幅を1/7弱にして均等に拡大可能とする。
-//            node.style.textAlign = "center";  // flexアイテムの内容を中央寄せにする。  
-//            return node;
-//        },
-//        dateflxIWithPost: function(date) {  // 投稿の日のflexアイテムを返す。
-//            var node = nd.calflxI(); // カレンダーのflexアイテムを取得。  
-//            node.className = "post";  // クラス名をpostにする。
-//            node.textContent = date;  // 日をtextノードに取得。textContentで代入すると子ノードは消えてしまうので注意。
-//            node.style.backgroundColor = "rgba(128,128,128,.4)";  // 背景色
-//            node.style.borderRadius = "50%";  // 背景の角を丸める
-//            node.style.cursor = "pointer";  // マウスポインタの形状を変化させる。
-//            return node;
-//        },
+
+
+
+
 //        datePostsNode: function() {  // 日の投稿データを表示させるflexコンテナを返す。
 //            var node = eh.createElem("div");  // flexコンテナになるdiv要素を生成。
 //            node.style.display = "flex";  // flexコンテナにする。
@@ -319,50 +274,11 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
 //            node.appendChild(titleflxI);
 //            return node;
 //        },
-//        _arrowflxI: function(text,id) {  // 月を移動するボタンを返す。
-//            var node = eh.createElem("div");  // flexアイテムになるdiv要素を生成。
-//            node.textContent = text;
-//            node.id = id;
-//            node.style.flex = "0 0 14%";  // 1/7幅で伸縮しない。
-//            node.style.textAlign = "center";
-//            return node;
+
+
 //        },
-//        leftarrowflxI: function() {  // 左向き矢印のflexアイテム。flexBasis14%。
-//            var dt = new Date();  // 今日の日付オブジェクトを取得。
-//            var now = new Date(dt.getFullYear(), dt.getMonth(),1);  // 今月の1日のミリ秒を取得。
-//            var caldate = new Date(g.y, g.m-1,1);  // カレンダーの1日のミリ秒を取得。
-//            if (now > caldate) {  // 表示カレンダーの月が現在より過去のときのみ左矢印を表示させる。
-//                var node = nd._arrowflxI('\u00ab',"left_calendar");
-//                node.style.cursor = "pointer";  // マウスポインタの形状を変化させる。
-//                node.title = (g.L10N)?"Newer":"翌月へ";
-//                return node;
-//            } else {
-//                return nd._arrowflxI(null,null);
-//            }
-//        },
-//        rightarrowflxI: function() {  // 右向き矢印のflexアイテム。flexBasis14%。
-//            var dt = new Date(2013,3,1);  // 最初の投稿月の日付オブジェクトを取得。
-//            var firstpost = new Date(dt.getFullYear(), dt.getMonth(),1);  // 今月の1日のミリ秒を取得。
-//            var caldate = new Date(g.y, g.m-1,1);  // カレンダーの1日のミリ秒を取得。
-//            if (firstpost > caldate) {  // 表示カレンダーの月が初投稿より未来のときのみ右矢印を表示させる。
-//                return nd._arrowflxI(null,null);
-//            } else {
-//                var node = nd._arrowflxI('\u00bb',"right_calendar");
-//                node.style.cursor = "pointer";  // マウスポインタの形状を変化させる。
-//                node.title = (g.L10N)?"Older":"前月へ";
-//                return node;
-//            }
-//        },        
-//        titleflxI: function(title) {
-//            var node = eh.createElem("div");  // flexアイテムになるdiv要素を生成。
-//            node.textContent = title;
-//            node.id = "title_calendar";
-//            node.style.flex = "1 0 72%";
-//            node.style.textAlign = "center";
-//            node.style.cursor = "pointer";  // マウスポインタの形状を変化させる。
-//            node.title = (g.L10N)?"Switching between published and updated":"公開日と更新日を切り替える";
-//            return node;
-//        }
+
+
 //    };  // end of nd
     var eh = {  // イベントハンドラオブジェクト。
         _node: null,  // 投稿一覧を表示しているノード。
