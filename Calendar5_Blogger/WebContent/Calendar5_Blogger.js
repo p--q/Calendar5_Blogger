@@ -21,7 +21,7 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                     g.elem.textContent = null;  // 追加する対象の要素の子ノードを消去する。
                     g.elem.appendChild(m);  // 追加する対象の要素の子ノードにカレンダーのflexコンテナを追加。
                     g.elem.appendChild(pt.elem);  // 投稿リストを表示するノードを追加。
-                    pt.expandPostList(); // 投稿リストを展開する。
+                    if (!g.d) {pt.expandPostList()}; // g.dがnullのときのみアイテムページの時投稿リストを展開する。
                 } else {  // 未取得のフィードを再取得する。最新の投稿が先頭に来る。
                     var m = /(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d)\.\d\d\d(.\d\d:\d\d)/i.exec(json.feed.entry[json.feed.entry.length-1][g.order].$t);  // フィードの最終投稿（最古）データの日時を取得。
                     var dt = new Date;  // 日付オブジェクトを生成。
@@ -41,10 +41,10 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                 cal.init();  // カレンダーのノードの不変部分を作成しておく。
                 pt.init();  // 投稿リストのノードの不変部分を作成しておく。
                 var dt; // 日付オブジェクト。
-                var mc = /\/(20\d\d)\/([01]\d)\//.exec(document.URL);  // URLから年と月を正規表現で得る。
-                if (mc) {  // URLから年と月を取得できた時。つまりアイテムページの時。
-                    var m = Number(mc[2]) - 1;  // 月ひく1を取得
-                    dt = new Date(mc[1],m,1);  // 投稿月の日付オブジェクトを取得。
+                g.mc = /\/(20\d\d)\/([01]\d)\//.exec(document.URL);  // URLから年と月を正規表現で得る。
+                if (g.mc) {  // URLから年と月を取得できた時。つまりアイテムページの時。
+                    var m = Number(g.mc[2]) - 1;  // 月ひく1を取得
+                    dt = new Date(g.mc[1],m,1);  // 投稿月の日付オブジェクトを取得。
                 } else {  // アイテムページ以外の時は今日の日付を取得。
                     dt = new Date();
                 };
@@ -67,7 +67,9 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
             g.dic = {};  // 投稿データをリセットする。キーを日、値を投稿のURLと投稿タイトルの配列の配列、とする辞書。
         },
         L10N: false,  // 日本語以外かのフラグ。
-        enM: ["Jan.","Feb.","Mar.","Apr.","May","Jun.","Jul.","Aug.","Sept.","Oct.","Nov.","Dec."]
+        enM: ["Jan.","Feb.","Mar.","Apr.","May","Jun.","Jul.","Aug.","Sept.","Oct.","Nov.","Dec."],
+        mc: false,  // アイテムページの年[1]と月[2]の配列。
+        d: null  // アイテムページの日付を取得。
     };  // end of g
     var cal = {  // カレンダーを作成するオブジェクト。
         _holidayC: "rgb(255, 0, 0)",  // 休日の文字色
@@ -139,6 +141,7 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
             }
             var day =  caldt.getDay();  // 1日の曜日を取得。日曜日は0、土曜日は6になる。
             var c = 9 + day;  // 1日の要素番号−１。
+            pt.dic = {};  // 日付、とカレンダーノードの辞書をリセットする。
             for(var i = 1; i < 1+g.em; i++) { // 1日から末日まで。
             	var d = m.childNodes[c+i];
             	d.appendChild(nd.createTxt(i));
@@ -257,21 +260,20 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
             	}
             });    			
 		},
-		expandPostList: function() {  // アイテムページのときのみ投稿リストを展開する
-			if (/\/20\d\d\/[01]\d\//.test(document.URL)) {  // アイテムページの時
-				var reF = /\w+.html$/  // htmlファイル名を抽出する正規表現パターン。
-				var keys = Object.keys(pt.dic);  // 投稿のある日付の配列を取得。
-				for (i=0;i<keys.length;i++) {  // forEachメソッドでは途中で抜けれないのでfor文を使う。
-					var key = keys[i];  // 投稿のある日付を取得。
-					g.dic[key].forEach(function(arr,j) {  // 日付の[投稿のURL, 投稿タイトル, サムネイルのURL]の配列の配列の各配列について。
-						if (reF.exec(document.URL)[0] == reF.exec(arr[0])[0]) {  // 投稿のhtmlファイル名が一致するとき。TDLが異なるのでURL直接は比較できない。
-			            	eh.node =  pt.dic[key];  // カレンダーの日付のノードを取得。
-			            	pt.createPostList(eh.node,j);  // 投稿リストの作成。ハイライトする投稿の要素番号も渡す。
-			            	return;  // for文を抜ける。
-			            }
-					});
-				}	
-			}
+		expandPostList: function() {  // 投稿リストを展開して現在のアイテムページの投稿のリストのノードをハイライトする。
+			var reF = /\w+.html$/  // htmlファイル名を抽出する正規表現パターン。
+			var keys = Object.keys(pt.dic);  // 投稿のある日付の配列を取得。
+			for (i=0;i<keys.length;i++) {  // forEachメソッドでは途中で抜けれないのでfor文を使う。
+				key = keys[i];  // 投稿のある日付を取得。
+				g.dic[key].forEach(function(arr,j) {  // 日付の[投稿のURL, 投稿タイトル, サムネイルのURL]の配列の配列の各配列について。
+					if (reF.exec(document.URL)[0] == reF.exec(arr[0])[0]) {  // 投稿のhtmlファイル名が一致するとき。TDLが異なるのでURL直接は比較できない。
+						g.d = key;  // アイテムページの日付を記録する。
+		            	eh.node =  pt.dic[key];  // カレンダーの日付のノードを取得。
+		            	pt.createPostList(eh.node,j);  // 投稿リストの作成。ハイライトする投稿の要素番号も渡す。
+		            	return;  // for文を抜ける。
+		            }
+				});
+			}	
 		}
     };  // end of pt
     var eh = {  // イベントハンドラオブジェクト。
@@ -288,7 +290,15 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                         eh.node.style.textDecoration = null;  // 文字の下線を消す。
                     }
                     eh.node = target;  // 投稿を表示させるノードを新たに取得。
-                    pt.createPostList(target,null);             
+                    var flag = false;  // ハイライトつけて展開するかのフラグ。
+                    if (g.mc) {  // アイテムページの時
+                    	if (g.mc[1] == g.y && g.mc[2] == g.m && target.textContent == g.d) {flag = true;};  // targetがアイテムページの投稿の年月日と一致するとき。 
+                    } 
+                    if (flag) {
+                    	pt.expandPostList();  // ハイライト付きで投稿リストを展開する。
+                    } else {
+                    	pt.createPostList(target,null);  // ハイライトなしで投稿リストを展開する。
+                    }
                     break;
                 case "nopost":  // 投稿がない日のとき
                     pt.elem.textContent = null;  // 表示を消す。
