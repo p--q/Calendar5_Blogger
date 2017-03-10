@@ -200,6 +200,9 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
             g.init_d(dt);  // 日付オブジェクトからカレンダーのデータを作成。
             var max = g.y + "-" + fd.fm(g.m) + "-" + fd.fm(g.em) + "T23:59:59%2B09:00";  // 表示カレンダーの最終日23時59分59秒までのフィードを得るための日時を作成。
             fd.createURL(max);  // フィードを取得するためのURLを作成。            
+        },
+        removeParam: function(thisUrl) {
+        	return thisUrl.replace(/\?m=[01][&\?]/,"?").replace(/[&\?]m=[01]/,"");  // ウェブバージョンとモバイルサイトのパラメータを削除。
         }
     };  // end of fd
     var nd = {  // ノード関連。
@@ -261,12 +264,13 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
             });    			
 		},
 		expandPostList: function() {  // 投稿リストを展開して現在のアイテムページの投稿のリストのノードをハイライトする。
+			var thisUrl = fd.removeParam(document.URL);  // URLからパラメータを除去する。
 			var reF = /\w+.html$/  // htmlファイル名を抽出する正規表現パターン。
 			var keys = Object.keys(pt.dic);  // 投稿のある日付の配列を取得。
 			for (i=0;i<keys.length;i++) {  // forEachメソッドでは途中で抜けれないのでfor文を使う。
 				key = keys[i];  // 投稿のある日付を取得。
 				g.dic[key].forEach(function(arr,j) {  // 日付の[投稿のURL, 投稿タイトル, サムネイルのURL]の配列の配列の各配列について。
-					if (reF.exec(document.URL)[0] == reF.exec(arr[0])[0]) {  // 投稿のhtmlファイル名が一致するとき。TDLが異なるのでURL直接は比較できない。
+					if (reF.exec(thisUrl)[0] == reF.exec(arr[0])[0]) {  // 投稿のhtmlファイル名が一致するとき。TDLが異なるのでURL直接は比較できない。
 						g.d = key;  // アイテムページの日付を記録する。
 		            	eh.node =  pt.dic[key];  // カレンダーの日付のノードを取得。
 		            	pt.createPostList(eh.node,j);  // 投稿リストの作成。ハイライトする投稿の要素番号も渡す。
