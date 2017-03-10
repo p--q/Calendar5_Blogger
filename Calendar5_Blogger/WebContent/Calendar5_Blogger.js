@@ -321,10 +321,12 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                             fd.getFeed(dt);
                             break;
                         case "left_calendar":
+                        	target.style.pointerEvents = "none";  // 連続クリックできないようにする。
                             dt = new Date(g.y,g.m,1);  // 翌月の日付オブジェクト。
                             fd.getFeed(dt);
                             break;
                         case "right_calendar":  
+                        	target.style.pointerEvents = "none";  // 連続クリックできないようにする。
                             dt = new Date(g.y,g.m-2,1);  // 前月の日付オブジェクト。
                             fd.getFeed(dt);
                             break;
