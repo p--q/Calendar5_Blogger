@@ -313,21 +313,20 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                     }
                     break;
                 default:
-                    var dt;
                     switch (target.id) {
                         case "title_calendar":  // 公開日と更新日を切り替える。
                             g.order = (g.order=="published")?"updated":"published";
-                            dt = new Date(g.y, g.m-1, 1);
+                            var dt = new Date(g.y, g.m-1, 1);
                             fd.getFeed(dt);
                             break;
                         case "left_calendar":
                         	target.style.pointerEvents = "none";  // 連続クリックできないようにする。
-                            dt = new Date(g.y,g.m,1);  // 翌月の日付オブジェクト。
+                            var dt = new Date(g.y,g.m,1);  // 翌月の日付オブジェクト。
                             fd.getFeed(dt);
                             break;
                         case "right_calendar":  
                         	target.style.pointerEvents = "none";  // 連続クリックできないようにする。
-                            dt = new Date(g.y,g.m-2,1);  // 前月の日付オブジェクト。
+                            var dt = new Date(g.y,g.m-2,1);  // 前月の日付オブジェクト。
                             fd.getFeed(dt);
                             break;
                     }
