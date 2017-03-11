@@ -12,8 +12,7 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                         g.dic[d] = g.dic[d] || [];  // 辞書の値の配列を初期化する。
                         var url = (e.media$thumbnail)?e.media$thumbnail.url:null;  // サムネイルのurl。
                         g.dic[d].push([e.link[4].href, e.link[4].title, url]);  // 辞書の値の配列に[投稿のURL, 投稿タイトル, サムネイルのURL]の配列を入れて2次元配列にする。
-                        }
-                    );
+                    });
                     var m = cal.createCalendar();  // フィードデータからカレンダーを作成する。
                     m.addEventListener( 'mousedown', eh.mouseDown, false );  // カレンダーのflexコンテナでイベントバブリングを受け取る。マウスが要素をクリックしたとき。
                     m.addEventListener( 'mouseover', eh.mouseOver, false );  // マウスポインタが要素に入った時。
@@ -21,13 +20,14 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                     g.elem.textContent = null;  // 追加する対象の要素の子ノードを消去する。
                     g.elem.appendChild(m);  // 追加する対象の要素の子ノードにカレンダーのflexコンテナを追加。
                     g.elem.appendChild(pt.elem);  // 投稿リストを表示するノードを追加。
-                    if (!g.d&&g.mc) {pt.expandPostList()}; // g.dがnullかつアイテムページの時のみアイテムページの投稿リストを展開する。
+//                    if (!g.d&&g.mc) {pt.expandPostList()}; // g.dがnull(why?)かつアイテムページの時のみアイテムページの投稿リストを展開する。
+                    if (g.mc) {pt.expandPostList()}; // アイテムページの時のみアイテムページの投稿リストを展開する。
                 } else {  // 未取得のフィードを再取得する。最新の投稿が先頭に来る。
                     var m = /(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d)\.\d\d\d(.\d\d:\d\d)/i.exec(json.feed.entry[json.feed.entry.length-1][g.order].$t);  // フィードの最終投稿（最古）データの日時を取得。
                     var dt = new Date;  // 日付オブジェクトを生成。
                     dt.setTime(new Date(m[1] + m[2]).getTime() - 1 * 1000);  // 最古の投稿の日時より1秒早めるた日時を取得。ミリ秒に変換して計算。
                     if (g.m==dt.getMonth()+1) {  // 1秒早めても同じ月ならば
-                        var max = g.y + "-" + fd.fm(g.m) + "-" + cal.fd.fm(dt.getDate()) + "T" + fd.fm(dt.getHours()) + ":" + fd.fm(dt.getMinutes()) + ":" + fd.fm(dt.getSeconds()) + "%2B09:00";  // フィード取得のための最新日時を作成。
+                        var max = g.y + "-" + fd.fm(g.m) + "-" + fd.fm(dt.getDate()) + "T" + fd.fm(dt.getHours()) + ":" + fd.fm(dt.getMinutes()) + ":" + fd.fm(dt.getSeconds()) + "%2B09:00";  // フィード取得のための最新日時を作成。
                         fd.createURL(max);  // フィード取得のURLを作成。                       
                     }
                 }  
@@ -313,6 +313,7 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                     }
                     break;
                 default:
+                	target.style.pointerEvents = "none";  // 連続クリックできないようにする。
                     switch (target.id) {
                         case "title_calendar":  // 公開日と更新日を切り替える。
                             g.order = (g.order=="published")?"updated":"published";
@@ -320,12 +321,10 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                             fd.getFeed(dt);
                             break;
                         case "left_calendar":
-                        	target.style.pointerEvents = "none";  // 連続クリックできないようにする。
                             var dt = new Date(g.y,g.m,1);  // 翌月の日付オブジェクト。
                             fd.getFeed(dt);
                             break;
                         case "right_calendar":  
-                        	target.style.pointerEvents = "none";  // 連続クリックできないようにする。
                             var dt = new Date(g.y,g.m-2,1);  // 前月の日付オブジェクト。
                             fd.getFeed(dt);
                             break;
