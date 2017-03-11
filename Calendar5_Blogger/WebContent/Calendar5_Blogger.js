@@ -215,10 +215,13 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
 		dic: {},  // keyが日付、値がカレンダーのノードの辞書。
 		elem: null,  // 投稿リストを表示させるノード。
 		_nodes: null,  // 投稿リストのノードの不変部分
+		_reF: /\w+\.html/,  // htmlファイル名を抽出する正規表現パターン。
 		init: function() {
 			pt._nodes = pt._createNodes();  // 投稿リストのノードの不変部分の取得。
 			pt.elem = nd.createElem("div");  // 投稿リストの年月日を表示する要素の作成。
 			pt.elem.setAttribute("style","display:flex;flex-direction:column;padding-top:5px;text-align:center;");
+			var thisUrl = fd.removeParam(document.URL);  // URLからパラメータを除去する。
+			pt._html = pt._reF.exec(thisUrl);  // URLからhtmlファイル名を取得。
 		},
 		_createNodes: function() {  // 投稿リストのノードの不変部分を作成しておく。
 			var p = nd.createElem("div");	
@@ -263,14 +266,12 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
             });
 		},
 		getPostDate: function() {  // アイテムページのURLからhtmlファイル名を比較して投稿日とハイライトする投稿番号を取得。
-			var thisUrl = fd.removeParam(document.URL);  // URLからパラメータを除去する。
-			var reF = /\w+\.html/  // htmlファイル名を抽出する正規表現パターン。
 			var days = Object.keys(g.dic);  // 投稿のある日付の配列を取得。
 			for (i=0;i<days.length;i++) {  // forEachメソッドでは途中で抜けれないのでfor文を使う。
 				var d = days[i];  // 日付を取得。
 				var posts = g.dic[d]; // 各日付の投稿の配列を取得。
 				for (j=0;j<posts.length;j++) {  // 各投稿について
-					if (reF.exec(thisUrl)[0] == reF.exec(posts[j])[0]) {  // 投稿のhtmlファイル名が一致するとき。フィードは.comで返ってきてTDLが異なるのでURL直接は比較できない。
+					if (pt._html[0] == pt._reF.exec(posts[j])[0]) {  // 投稿のhtmlファイル名が一致するとき。フィードは.comで返ってきてTDLが異なるのでURL直接は比較できない。
 		            	eh.node =  pt.dic[d];  // カレンダーの日付のノードを取得。
 		            	pt.createPostList(j);  // 投稿リストの作成。ハイライトする投稿の要素番号も渡す。
 		            	return;  // for文を抜ける。
@@ -279,11 +280,9 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
 			}			
 		},
 		getHighlightPostNo: function() {  // アイテムページのURLからhtmlファイル名を比較してハイライトする投稿番号を取得。
-			var thisUrl = fd.removeParam(document.URL);  // URLからパラメータを除去する。
-			var reF = /\w+\.html/  // htmlファイル名を抽出する正規表現パターン。
 			var arr = g.dic[eh.node.textContent];  // その日付の投稿リストを取得。
 			for (i=0;i<arr.length;i++) {
-				if (reF.exec(thisUrl)[0] == reF.exec(arr[i])[0]) {  // 投稿のhtmlファイル名が一致するとき。フィードは.comで返ってきてTDLが異なるのでURL直接は比較できない。
+				if (pt._html[0] == pt._reF.exec(arr[i])[0]) {  // 投稿のhtmlファイル名が一致するとき。フィードは.comで返ってきてTDLが異なるのでURL直接は比較できない。
 					pt.createPostList(i);  // 投稿リストの作成。ハイライトする投稿の要素番号も渡す。
 					return;
 				}
