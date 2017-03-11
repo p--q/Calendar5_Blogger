@@ -260,7 +260,7 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
             		var p = pt.elem.lastChild;  // ハイライトする投稿のリストのノードを取得。
             		p.setAttribute("style",p.style.cssText + "background-color:#eee;border:solid 1px #dddddd;border-radius:5px;pointer-events:none;");  // アンカータグのリンクも無効にする。
             	}
-            });    			
+            });
 		},
 		getPostDate: function() {  // アイテムページのURLからhtmlファイル名を比較して投稿日とハイライトする投稿番号を取得。
 			var thisUrl = fd.removeParam(document.URL);  // URLからパラメータを除去する。
@@ -317,21 +317,24 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                         eh.node.style.textDecoration = null;  // 文字の下線を消す。
                         eh.node.style.backgroundColor = eh._rgbaC; // そのノードの背景色を元に戻す。
                         eh.node = null;  // 取得しているノードを消去。
+                        target.style.pointerEvents = null;  // クリックを有効にする。
                     }
                     break;
                 default:
-                	target.style.pointerEvents = "none";  // 連続クリックできないようにする。
                 	var dt = new Date(g.y, g.m-1, 1);  // 表示しているカレンダーの1日の日付オブジェクトを取得。
                     switch (target.id) {
                         case "title_calendar":  // 公開日と更新日を切り替える。
+                        	target.style.pointerEvents = "none";  // 連続クリックできないようにする。
                             g.order = (g.order=="published")?"updated":"published";
                             fd.getFeed(dt);
                             break;
                         case "left_calendar":
+                        	target.style.pointerEvents = "none";  // 連続クリックできないようにする。
                             dt.setMonth(dt.getMonth() + 1);  // 翌月の日付オブジェクトを取得。
                             fd.getFeed(dt);
                             break;
                         case "right_calendar":  
+                        	target.style.pointerEvents = "none";  // 連続クリックできないようにする。
                         	dt.setMonth(dt.getMonth() - 1);  // 前月の日付オブジェクトを取得。
                             fd.getFeed(dt);
                             break;
