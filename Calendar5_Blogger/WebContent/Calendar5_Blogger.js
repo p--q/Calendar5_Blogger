@@ -20,13 +20,14 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                     g.elem.textContent = null;  // 追加する対象の要素の子ノードを消去する。
                     g.elem.appendChild(m);  // 追加する対象の要素の子ノードにカレンダーのflexコンテナを追加。
                     g.elem.appendChild(pt.elem);  // 投稿リストを表示するノードを追加。
-//                    if (!g.d&&g.mc) {pt.expandPostList()}; // g.dがnull(why?)かつアイテムページの時のみアイテムページの投稿リストを展開する。
-                    if (g.mc) {pt.expandPostList()}; // アイテムページの時のみアイテムページの投稿リストを展開する。
+                    if (!g.d&&g.mc) {pt.expandPostList()}; // g.dがnull(つまりページのリロード時のみ)かつアイテムページの時のみアイテムページの投稿リストを展開する。
                 } else {  // 未取得のフィードを再取得する。最新の投稿が先頭に来る。
                     var m = /(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d)\.\d\d\d(.\d\d:\d\d)/i.exec(json.feed.entry[json.feed.entry.length-1][g.order].$t);  // フィードの最終投稿（最古）データの日時を取得。
-                    var dt = new Date;  // 日付オブジェクトを生成。
-                    dt.setTime(new Date(m[1] + m[2]).getTime() - 1 * 1000);  // 最古の投稿の日時より1秒早めるた日時を取得。ミリ秒に変換して計算。
-                    if (g.m==dt.getMonth()+1) {  // 1秒早めても同じ月ならば
+//                    var dt = new Date;  // 日付オブジェクトを生成。
+//                    dt.setTime(new Date(m[1] + m[2]).getTime() - 1 * 1000);  // 最古の投稿の日時より1秒早めた日時を取得。ミリ秒に変換して計算。
+                    var dt = new Date(m[1] + m[2]);  // フィードの最終投稿（最古）データの日時の日付オブジェクトを取得。
+                    dt.setSeconds(dt.getSeconds() - 1 );  // 最古の投稿の日時より1秒古い日時を取得。 	
+                    if (g.m==dt.getMonth()+1) {  // 1秒古くても同じ月ならば
                         var max = g.y + "-" + fd.fm(g.m) + "-" + fd.fm(dt.getDate()) + "T" + fd.fm(dt.getHours()) + ":" + fd.fm(dt.getMinutes()) + ":" + fd.fm(dt.getSeconds()) + "%2B09:00";  // フィード取得のための最新日時を作成。
                         fd.createURL(max);  // フィード取得のURLを作成。                       
                     }
@@ -41,7 +42,7 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                 cal.init();  // カレンダーのノードの不変部分を作成しておく。
                 pt.init();  // 投稿リストのノードの不変部分を作成しておく。
                 var dt; // 日付オブジェクト。
-                g.mc = /\/(20\d\d)\/([01]\d)\//.exec(document.URL);  // URLから年と月を正規表現で得る。
+                g.mc = /\/(20\d\d)\/([01]\d)\//.exec(document.URL);  // URLから年と月を正規表現で得る。g[1]が年、g.mc[2]が月。
                 if (g.mc) {  // URLから年と月を取得できた時。つまりアイテムページの時。
                     var m = Number(g.mc[2]) - 1;  // 月ひく1を取得
                     dt = new Date(g.mc[1],m,1);  // 投稿月の日付オブジェクトを取得。
@@ -314,18 +315,18 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                     break;
                 default:
                 	target.style.pointerEvents = "none";  // 連続クリックできないようにする。
+                	var dt = new Date(g.y, g.m-1, 1);  // 表示しているカレンダーの1日の日付オブジェクトを取得。
                     switch (target.id) {
                         case "title_calendar":  // 公開日と更新日を切り替える。
                             g.order = (g.order=="published")?"updated":"published";
-                            var dt = new Date(g.y, g.m-1, 1);
                             fd.getFeed(dt);
                             break;
                         case "left_calendar":
-                            var dt = new Date(g.y,g.m,1);  // 翌月の日付オブジェクト。
+                            dt.setMonth(dt.getMonth() + 1);  // 翌月の日付オブジェクトを取得。
                             fd.getFeed(dt);
                             break;
                         case "right_calendar":  
-                            var dt = new Date(g.y,g.m-2,1);  // 前月の日付オブジェクト。
+                        	dt.setMonth(dt.getMonth() - 1);  // 前月の日付オブジェクトを取得。
                             fd.getFeed(dt);
                             break;
                     }
