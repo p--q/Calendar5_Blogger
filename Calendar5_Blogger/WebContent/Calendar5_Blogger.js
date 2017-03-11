@@ -265,7 +265,7 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
 		},
 		expandPostList: function() {  // 投稿リストを展開して現在のアイテムページの投稿のリストのノードをハイライトする。
 			var thisUrl = fd.removeParam(document.URL);  // URLからパラメータを除去する。
-			var reF = /\w+.html$/  // htmlファイル名を抽出する正規表現パターン。
+			var reF = /\w+\.html/  // htmlファイル名を抽出する正規表現パターン。
 			var keys = Object.keys(pt.dic);  // 投稿のある日付の配列を取得。
 			for (i=0;i<keys.length;i++) {  // forEachメソッドでは途中で抜けれないのでfor文を使う。
 				key = keys[i];  // 投稿のある日付を取得。
