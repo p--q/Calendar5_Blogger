@@ -20,11 +20,10 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                     g.elem.textContent = null;  // 追加する対象の要素の子ノードを消去する。
                     g.elem.appendChild(m);  // 追加する対象の要素の子ノードにカレンダーのflexコンテナを追加。
                     g.elem.appendChild(pt.elem);  // 投稿リストを表示するノードを追加。
-                    if (!g.d&&g.mc) {pt.expandPostList()}; // g.dがnull(つまりページのリロード時のみ)かつアイテムページの時のみアイテムページの投稿リストを展開する。
+//                    if (!g.dt&&g.mc) {pt.getPostDate()}; // g.dtがnull(つまりページのロード時のみ)かつアイテムページの時のみアイテムページの投稿リストを展開する。
+                    if (!eh.node&&g.mc) {pt.getPostDate()}; // eh.nodeがnull(つまりページのロード時のみ)かつアイテムページの時のみアイテムページの投稿リストを展開する。
                 } else {  // 未取得のフィードを再取得する。最新の投稿が先頭に来る。
                     var m = /(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d)\.\d\d\d(.\d\d:\d\d)/i.exec(json.feed.entry[json.feed.entry.length-1][g.order].$t);  // フィードの最終投稿（最古）データの日時を取得。
-//                    var dt = new Date;  // 日付オブジェクトを生成。
-//                    dt.setTime(new Date(m[1] + m[2]).getTime() - 1 * 1000);  // 最古の投稿の日時より1秒早めた日時を取得。ミリ秒に変換して計算。
                     var dt = new Date(m[1] + m[2]);  // フィードの最終投稿（最古）データの日時の日付オブジェクトを取得。
                     dt.setSeconds(dt.getSeconds() - 1 );  // 最古の投稿の日時より1秒古い日時を取得。 	
                     if (g.m==dt.getMonth()+1) {  // 1秒古くても同じ月ならば
@@ -70,7 +69,7 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
         L10N: false,  // 日本語以外かのフラグ。
         enM: ["Jan.","Feb.","Mar.","Apr.","May","Jun.","Jul.","Aug.","Sept.","Oct.","Nov.","Dec."],
         mc: false,  // アイテムページの年[1]と月[2]の配列。
-        d: null  // アイテムページの日付を取得。
+//        dt: null  // アイテムページの日付オブジェクトを取得。
     };  // end of g
     var cal = {  // カレンダーを作成するオブジェクト。
         _holidayC: "rgb(255, 0, 0)",  // 休日の文字色
@@ -249,36 +248,50 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
 			p.childNodes[1].childNodes[0].appendChild(nd.createTxt(arr[1]))  // 投稿タイトルを取得。
 			return p;
 		},
-		createPostList: function(target,j) {  // 投稿リストのタイトルを作成。2番目の引数はハイライトする投稿の要素番号。
-            if (g.L10N) {
-                pt.elem.textContent = g.order + ": " + g.enM[g.m-1] + " " + target.textContent + " " + g.y;
+		createPostList: function(postNo) {  // 投稿リストのタイトルを作成。2番目の引数はハイライトする投稿の要素番号。
+			var d = parseInt(eh.node.textContent,10);  // 日付を取得。
+            if (g.L10N) {  // 投稿リストのタイトルを設定。
+                pt.elem.textContent = g.order + ": " + g.enM[g.m-1] + " " + d + " " + g.y;
             } else {
                 var order = (g.order=="published")?"公開":"更新";
-                pt.elem.textContent = g.y + "/" + g.m + "/" + target.textContent + "(" + g.days[target.getAttribute("data-remainder")] + ") " + order;
+                pt.elem.textContent = g.y + "/" + g.m + "/" + d + "(" + g.days[eh.node.getAttribute("data-remainder")] + ") " + order;
             }
-            g.dic[target.textContent].forEach(function(e,i) {  // 選択している日付の投稿リストを作成。
+            g.dic[d].forEach(function(e,i) {  // 選択している日付の投稿リストを作成。
             	pt.elem.appendChild(pt._postNode(e));
-            	if (i==j) {  // ハイライトする投稿のとき
+            	if (i==postNo) {  // ハイライトする投稿のとき
             		var p = pt.elem.lastChild;  // ハイライトする投稿のリストのノードを取得。
             		p.setAttribute("style",p.style.cssText + "background-color:#eee;border:solid 1px #dddddd;border-radius:5px;pointer-events:none;");  // アンカータグのリンクも無効にする。
             	}
             });    			
 		},
-		expandPostList: function() {  // 投稿リストを展開して現在のアイテムページの投稿のリストのノードをハイライトする。
+		getPostDate: function() {  // アイテムページのURLからhtmlファイル名を比較して投稿日とハイライトする投稿番号を取得。
 			var thisUrl = fd.removeParam(document.URL);  // URLからパラメータを除去する。
 			var reF = /\w+\.html/  // htmlファイル名を抽出する正規表現パターン。
-			var keys = Object.keys(pt.dic);  // 投稿のある日付の配列を取得。
-			for (i=0;i<keys.length;i++) {  // forEachメソッドでは途中で抜けれないのでfor文を使う。
-				key = keys[i];  // 投稿のある日付を取得。
-				g.dic[key].forEach(function(arr,j) {  // 日付の[投稿のURL, 投稿タイトル, サムネイルのURL]の配列の配列の各配列について。
-					if (reF.exec(thisUrl)[0] == reF.exec(arr[0])[0]) {  // 投稿のhtmlファイル名が一致するとき。フィードは.comで返ってきてTDLが異なるのでURL直接は比較できない。
-						g.d = key;  // アイテムページの日付を記録する。
-		            	eh.node =  pt.dic[key];  // カレンダーの日付のノードを取得。
-		            	pt.createPostList(eh.node,j);  // 投稿リストの作成。ハイライトする投稿の要素番号も渡す。
+			var days = Object.keys(g.dic);  // 投稿のある日付の配列を取得。
+			for (i=0;i<days.length;i++) {  // forEachメソッドでは途中で抜けれないのでfor文を使う。
+				var d = days[i];  // 日付を取得。
+				var posts = g.dic[d]; // 各日付の投稿の配列を取得。
+				for (j=0;j<posts.length;j++) {  // 各投稿について
+					if (reF.exec(thisUrl)[0] == reF.exec(posts[j])[0]) {  // 投稿のhtmlファイル名が一致するとき。フィードは.comで返ってきてTDLが異なるのでURL直接は比較できない。
+//						g.dt = new Date(g.y,g.m-1,d);  // アイテムページの日付を記録する。
+		            	eh.node =  pt.dic[d];  // カレンダーの日付のノードを取得。
+		            	pt.createPostList(j);  // 投稿リストの作成。ハイライトする投稿の要素番号も渡す。
 		            	return;  // for文を抜ける。
-		            }
-				});
-			}	
+		            } 
+				}
+			}			
+		},
+		getHighlightPostNo: function() {  // アイテムページのURLからhtmlファイル名を比較してハイライトする投稿番号を取得。
+			var thisUrl = fd.removeParam(document.URL);  // URLからパラメータを除去する。
+			var reF = /\w+\.html/  // htmlファイル名を抽出する正規表現パターン。
+			var arr = g.dic[eh.node.textContent];  // その日付の投稿リストを取得。
+			for (i=0;i<arr.length;i++) {
+				if (reF.exec(thisUrl)[0] == reF.exec(arr[i])[0]) {  // 投稿のhtmlファイル名が一致するとき。フィードは.comで返ってきてTDLが異なるのでURL直接は比較できない。
+					pt.createPostList(i);  // 投稿リストの作成。ハイライトする投稿の要素番号も渡す。
+					return;
+				}
+			}
+			pt.createPostList(null);  // ハイライトする投稿番号がなかった時はnullを渡す。
 		}
     };  // end of pt
     var eh = {  // イベントハンドラオブジェクト。
@@ -294,15 +307,11 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                         eh.node.style.backgroundColor = eh._rgbaC; // そのノードの背景色を元に戻す。
                         eh.node.style.textDecoration = null;  // 文字の下線を消す。
                     }
-                    eh.node = target;  // 投稿を表示させるノードを新たに取得。
-                    var flag = false;  // ハイライトつけて展開するかのフラグ。
+                    eh.node = target;  // 投稿を表示させるノードを取得。
                     if (g.mc) {  // アイテムページの時
-                    	if (g.mc[1] == g.y && g.mc[2] == g.m && target.textContent == g.d) {flag = true;};  // targetがアイテムページの投稿の年月日と一致するときflagを立てる。 
-                    } 
-                    if (flag) {
-                    	pt.expandPostList();  // ハイライト付きで投稿リストを展開する。
-                    } else {
-                    	pt.createPostList(target,null);  // ハイライトなしで投稿リストを展開する。
+                    	pt.getHighlightPostNo();  // ハイライト付きで投稿リストを展開する。
+                    } else {  // アイテムページ以外の時
+                    	pt.createPostList(null);  // ハイライトする投稿番号はnullを渡す。
                     }
                     break;
                 case "nopost":  // 投稿がない日のとき
