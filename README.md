@@ -1,3 +1,3 @@
 # Calendar Gadget for Blogger
 
-####Containing Eclipse Project
+Containing Eclipse Project
