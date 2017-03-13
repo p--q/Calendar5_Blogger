@@ -8,6 +8,8 @@ This gadget has been tested against the browsers listed below.
 
 * Firefox
 
+* Microsoft Edge
+
 * Safari (iOS)
 
 ##Parameters
