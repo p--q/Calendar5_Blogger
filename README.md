@@ -46,7 +46,7 @@ the content of Calendar5_Blogger.js or Calendar5_Blogger.min.js
 
 Paste this code in the HTML/JavaScript Gadget and place it on where you want to display the calendar on Layout editor.
 
-To display the calendar on the mobile version,  the 'mobile =yes' attribute shoud be added to the HTML widget holding the calender gadget.
+To display the calendar on the mobile version,  the `'mobile =yes'` attribute shoud be added to the HTML widget holding the calender gadget.
 
 ##Usage
 
