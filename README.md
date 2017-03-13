@@ -14,7 +14,6 @@ This gadget has been tested against the browsers listed below.
 ```
 Calendar5_Blogger.defaults["StartYear"] = 2013; // The earliest year of the calendar. 
 Calendar5_Blogger.defaults["StartMonth"] = 3; // The earliest month of the calendar.
-
 ```
 The earliest month of the calendar  is defined with a combination of the "StartYear" and "StartMonth" properties.
 
@@ -35,7 +34,9 @@ You can easily create the holiday JSON at  [休日のJSONの作成ツール、�
 ```
 <div id="calendar5_blogger"></div>
 <script> 
+...
 the content of Calendar5_Blogger.js or Calendar5_Blogger.min.js 
+...
 </script>
 ```
 
