@@ -1,3 +1,5 @@
+#Calendar Gadget for Blogger.com
+
 ##Browser Support
 
 This gadget has been tested against the browsers listed below.
