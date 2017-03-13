@@ -33,7 +33,7 @@ The key is a year and the value is an array of arrays of containing holidays of 
 
 You can easily create the holiday JSON at  [休日のJSONの作成ツール、日数計算ツール](https://p--q.blogspot.jp/2017/01/json.html).
 
-##How to deploy
+##How to Deploy
 
 ```
 <div id="calendar5_blogger"></div>
