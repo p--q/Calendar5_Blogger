@@ -2,9 +2,9 @@
 
 This gadget has been tested against the browsers listed below.
 
-*Chrome(Chromium)
+* Chrome(Chromium)
 
-*Firefox
+* Firefox
 
-*Safari (iOS)
+* Safari (iOS)
 
