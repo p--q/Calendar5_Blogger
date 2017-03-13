@@ -32,7 +32,9 @@ You can easily create the holiday JSON at  [休日のJSONの作成ツール、�
 
 ```
 <div id="calendar5_blogger"></div>
-<script> the content of Calendar5_Blogger.js or <Calendar5_Blogger.min.js/script>
+<script> 
+the content of Calendar5_Blogger.js or Calendar5_Blogger.min.js 
+</script>
 ```
 
 Paste this code in the HTML/JavaScript Gadget and place it on where you want to display the calendar on Layout editor.
