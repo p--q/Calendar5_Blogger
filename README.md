@@ -26,7 +26,7 @@ JSON has a list  of key :  value  pairs delimited by comma.
 
 The key is a year and the value is an array of arrays of containing holidays of each month of the year.
 
-You can easily create the holiday JSON at  休日のJSONの作成ツール、日数計算ツール.
+You can easily create the holiday JSON at  [休日のJSONの作成ツール、日数計算ツール](https://p--q.blogspot.jp/2017/01/json.html).
 
 ##How to deploy
 
@@ -41,6 +41,6 @@ To display the calendar on the mobile version,  rhe 'mobile =yes' attribute shou
 
 ##Usage
 
-You can see a working example on p--q's site.
+You can see a working example on [p--q](https://p--q.blogspot.jp/)'s site.
 
 When you hover on the calendar title or arrow, a tool tip comes out.
