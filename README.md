@@ -6,8 +6,8 @@ Containing Static Web Project created by Eclipse Java EE IDE for Web Developers 
 
 This gadget has been tested against the browsers listed below.
 
-*Chrom
+* Chrome
 
-*Firefox
+* Firefox
 
-*Safari (iOS)
+* Safari (iOS)
