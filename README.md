@@ -1,5 +1,7 @@
 #Calendar Gadget for [Blogger.com ](https://www.blogger.com/about/?r=1-null_user)
 
+This gadget uses feeds, so it will not work with private blogs.
+
 ##Browser Support
 
 This gadget has been tested against the browsers listed below.
