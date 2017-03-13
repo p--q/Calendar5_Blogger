@@ -1,4 +1,4 @@
-#Calendar Gadget for [Blogger.com - あなただけの素敵なブログを作りましょう。簡単、しかも無料です。](https://www.blogger.com/about/?r=1-null_user "Blogger.com - あなただけの素敵なブログを作りましょう。簡単、しかも無料です。")
+#Calendar Gadget for [Blogger.com ](https://www.blogger.com/about/?r=1-null_user)
 
 ##Browser Support
 
