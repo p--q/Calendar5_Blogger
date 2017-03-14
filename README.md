@@ -2,6 +2,10 @@
 
 This gadget uses feeds, so it will not work with private blogs.
 
+This repository contains the Eclipse project.
+
+Eclipse Java EE IDE for Web Developers.　Version: Mars.2 Release (4.5.2)
+
 ##Browser Support
 
 This gadget has been tested against the browsers listed below.
