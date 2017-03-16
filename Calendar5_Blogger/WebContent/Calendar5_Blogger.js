@@ -36,8 +36,6 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
             g.elem = document.getElementById(elemID);  // idから追加する対象の要素を取得。
             if (g.elem) {  // 追加対象の要素が存在するとき
             	st.init();  // 言語設定。
-//                g.L10N = (/.jp$/i.test(location.hostname))?false:true;  // jpドメイン以外のときフラグを立てる。
-//                g.init();  // 日付オブジェクトからカレンダーのデータを作り直す。
                 cal.init();  // カレンダーのノードの不変部分を作成しておく。
                 pt.init();  // 投稿リストのノードの不変部分を作成しておく。
                 var dt; // 日付オブジェクト。
@@ -56,9 +54,6 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
         max: 150,  // Bloggerのフィードで取得できる最大投稿数を設定。
         order: "published",  // publishedかupdatedが入る。
         elem: null,  // 置換するdiv要素。
-//        init: function() {
-//        	st.days = (g.L10N)?["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]: ["日","月","火","水","木","金","土"];  // 曜日の配列。
-//        },
         init_d: function (dt) {  // 日付オブジェクトからカレンダーのデータを作り直す。
             g.y = dt.getFullYear();  // 表示カレンダーの年を取得。
             g.m = dt.getMonth() + 1;  // 表示カレンダーの月を取得。
@@ -66,8 +61,6 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
             g.posts = [];  // フィードデータをリセットする。投稿のフィードデータを収納する配列。
             g.dic = {};  // 投稿データをリセットする。キーを日、値を投稿のURLと投稿タイトルの配列の配列、とする辞書。
         },
-//        L10N: false,  // 日本語以外かのフラグ。
-//        enM: ["Jan.","Feb.","Mar.","Apr.","May","Jun.","Jul.","Aug.","Sept.","Oct.","Nov.","Dec."],
         mc: false,  // アイテムページの年[1]と月[2]の配列。
     };  // end of g
     var st = {  // 言語置換
@@ -78,7 +71,6 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
 			st.left_arrow = (st.f)?"翌月へ":"Newer";
 			st.updated = (st.f)?"更新":"updated";	
 			st.published = (st.f)?"公開":"published";	
-//			st.titleText = (st.f)?g.y + "年" + g.m + "月":st.enM[g.m-1] + " " + g.y + " ";
 			st.tooltip = (st.f)?"公開日と更新日を切り替える":"Switching between published and updated";
 			st.right_arrow = (st.f)?"前月へ":"Older"; 
 		}	
