@@ -35,8 +35,9 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
         all: function(elemID) {  // ここから開始する。
             g.elem = document.getElementById(elemID);  // idから追加する対象の要素を取得。
             if (g.elem) {  // 追加対象の要素が存在するとき
-                g.L10N = (/.jp$/i.test(location.hostname))?false:true;  // jpドメイン以外のときフラグを立てる。
-                g.init();  // 日付オブジェクトからカレンダーのデータを作り直す。
+            	st.init();  // 言語設定。
+//                g.L10N = (/.jp$/i.test(location.hostname))?false:true;  // jpドメイン以外のときフラグを立てる。
+//                g.init();  // 日付オブジェクトからカレンダーのデータを作り直す。
                 cal.init();  // カレンダーのノードの不変部分を作成しておく。
                 pt.init();  // 投稿リストのノードの不変部分を作成しておく。
                 var dt; // 日付オブジェクト。
@@ -55,9 +56,9 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
         max: 150,  // Bloggerのフィードで取得できる最大投稿数を設定。
         order: "published",  // publishedかupdatedが入る。
         elem: null,  // 置換するdiv要素。
-        init: function() {
-        	g.days = (g.L10N)?["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]: ["日","月","火","水","木","金","土"];  // 曜日の配列。
-        },
+//        init: function() {
+//        	st.days = (g.L10N)?["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]: ["日","月","火","水","木","金","土"];  // 曜日の配列。
+//        },
         init_d: function (dt) {  // 日付オブジェクトからカレンダーのデータを作り直す。
             g.y = dt.getFullYear();  // 表示カレンダーの年を取得。
             g.m = dt.getMonth() + 1;  // 表示カレンダーの月を取得。
@@ -65,10 +66,23 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
             g.posts = [];  // フィードデータをリセットする。投稿のフィードデータを収納する配列。
             g.dic = {};  // 投稿データをリセットする。キーを日、値を投稿のURLと投稿タイトルの配列の配列、とする辞書。
         },
-        L10N: false,  // 日本語以外かのフラグ。
-        enM: ["Jan.","Feb.","Mar.","Apr.","May","Jun.","Jul.","Aug.","Sept.","Oct.","Nov.","Dec."],
+//        L10N: false,  // 日本語以外かのフラグ。
+//        enM: ["Jan.","Feb.","Mar.","Apr.","May","Jun.","Jul.","Aug.","Sept.","Oct.","Nov.","Dec."],
         mc: false,  // アイテムページの年[1]と月[2]の配列。
     };  // end of g
+    var st = {  // 言語置換
+    	enM: ["Jan.","Feb.","Mar.","Apr.","May","Jun.","Jul.","Aug.","Sept.","Oct.","Nov.","Dec."],
+		init: function() {
+			st.f = /.jp$/i.test(location.hostname);  // jpドメインのときtrueそうでなければfalse。
+			st.days = (st.f)?["日","月","火","水","木","金","土"]:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];  // 曜日の配列。
+			st.left_arrow = (st.f)?"翌月へ":"Newer";
+			st.updated = (st.f)?"更新":"updated";	
+			st.published = (st.f)?"公開":"published";	
+//			st.titleText = (st.f)?g.y + "年" + g.m + "月":st.enM[g.m-1] + " " + g.y + " ";
+			st.tooltip = (st.f)?"公開日と更新日を切り替える":"Switching between published and updated";
+			st.right_arrow = (st.f)?"前月へ":"Older"; 
+		}	
+    };  // end of st
     var cal = {  // カレンダーを作成するオブジェクト。
         _holidayC: "rgb(255, 0, 0)",  // 休日の文字色
         _SatC: "rgb(0, 51, 255)",  //  土曜日の文字色 
@@ -88,11 +102,11 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
         	m.appendChild(a.cloneNode(true));
         	var d = nd.createElem("div");
         	d.setAttribute("style","flex:1 0 14%;text-align:center;");
-        	g.days.forEach(function(e,i){  // 1行目に曜日を表示させる。2番目の引数は配列のインデックス。
+        	st.days.forEach(function(e,i){  // 1行目に曜日を表示させる。2番目の引数は配列のインデックス。
         		var node = d.cloneNode(true);
-        		node.appendChild(nd.createTxt(g.days[i]));
+        		node.appendChild(nd.createTxt(st.days[i]));
                 cal._getDayC(node,i);  // 曜日の色をつける。
-                if (g.L10N) {
+                if (!st.f) {
                     node.style.fontSize = "80%";  // 英語表記では1行に収まらないのでフォントサイズを縮小。
                 }
                 m.appendChild(node);  // カレンダーのflexコンテナに追加。
@@ -121,20 +135,21 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
         	if (now > caldate) {  // 表示カレンダーの月が現在より過去のときのみ左矢印を表示させる。
         		m.childNodes[0].appendChild(nd.createTxt('\u00ab'));
         		m.childNodes[0].style.cursor = "pointer";  // マウスポインタの形状を変化させる。
-        		m.childNodes[0].title = (g.L10N)?"Newer":"翌月へ";
+        		m.childNodes[0].title = st.left_arrow;
         		m.childNodes[0].id = "left_calendar";
         	}
-            var titleText =  (g.L10N)?((g.order=="published")?"":"updated"):((g.order=="published")?"":"更新");
-            titleText = (g.L10N)?g.enM[g.m-1] + " " + g.y + " " + titleText:g.y + "年" + g.m + "月" + titleText;
+            
+            var titleText = (st.f)?g.y + "年" + g.m + "月":st.enM[g.m-1] + " " + g.y + " ";
+            titleText +=  (g.order=="published")?"":st.updated;
             m.childNodes[1].appendChild(nd.createTxt(titleText));
-            m.childNodes[1].title = (g.L10N)?"Switching between published and updated":"公開日と更新日を切り替える";
+            m.childNodes[1].title = st.tooltip;
             m.childNodes[1].id = "title_calendar";
             dt = new Date(cl.defaults.StartYear,cl.defaults.StartMonth-1,1);  // 最初の投稿月の日付オブジェクトを取得。
             var firstpost = new Date(dt.getFullYear(), dt.getMonth(),1).getTime();  // 1日のミリ秒を取得。
             if (firstpost < caldate) {  // 表示カレンダーの月が初投稿月より未来のときのみ右矢印を表示させる。
         		m.childNodes[2].appendChild(nd.createTxt('\u00bb'));
         		m.childNodes[2].style.cursor = "pointer";  // マウスポインタの形状を変化させる。
-        		m.childNodes[2].title = (g.L10N)?"Older":"前月へ";   
+        		m.childNodes[2].title = st.right_arrow;   
         		m.childNodes[2].id = "right_calendar";
             }
             var day =  caldt.getDay();  // 1日の曜日を取得。日曜日は0、土曜日は6になる。
@@ -251,11 +266,11 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
 		},
 		createPostList: function(postNo) {  // 投稿リストのタイトルを作成。2番目の引数はハイライトする投稿の要素番号。
 			var d = parseInt(eh.node.textContent,10);  // 日付を取得。
-            if (g.L10N) {  // 投稿リストのタイトルを設定。
-                pt.elem.textContent = g.order + ": " + g.enM[g.m-1] + " " + d + " " + g.y;
+            if (!st.f) {  // 投稿リストのタイトルを設定。
+                pt.elem.textContent = g.order + ": " + st.enM[g.m-1] + " " + d + " " + g.y;
             } else {
-                var order = (g.order=="published")?"公開":"更新";
-                pt.elem.textContent = g.y + "/" + g.m + "/" + d + "(" + g.days[eh.node.getAttribute("data-remainder")] + ") " + order;
+                var order = (g.order=="published")?st.published:st.updated;
+                pt.elem.textContent = g.y + "/" + g.m + "/" + d + "(" + st.days[eh.node.getAttribute("data-remainder")] + ") " + order;
             }
             g.dic[d].forEach(function(e,i) {  // 選択している日付の投稿リストを作成。
             	pt.elem.appendChild(pt._postNode(e));
