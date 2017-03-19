@@ -103,20 +103,20 @@ var Calendar5_Blogger = Calendar5_Blogger || function() {
                 }
                 m.appendChild(node);  // カレンダーのflexコンテナに追加。
             });
+        	d.className = "nopost";
         	for (i=0;i<42;i++) {  // カレンダーの5行目まで作成。
-        		cal._createDateNodes(m,d);
+        		m.appendChild(cal._createDateNodes(d));  // カレンダーのflexコンテナに追加。
         	}
         	d.style.display = "none";  // カレンダーの6行目はデフォルトでは表示させない。
         	for (i=0;i<7;i++) {
-        		cal._createDateNodes(m,d);
+        		m.appendChild(cal._createDateNodes(d));  // カレンダーのflexコンテナに追加。
         	}
         	return m;
         },
-        _createDateNodes: function(m,d) {
+        _createDateNodes: function(d) {
     		var node = d.cloneNode(true);
     		cal._getDayC(node,i%7);  // 曜日の色をつける。
-    		node.className = "nopost";
-    		m.appendChild(node); 
+    		return node;
         },
         createCalendar:  function() {  // カレンダーのHTML要素を作成。 
         	var m = cal._nodes.cloneNode(true);
